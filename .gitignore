@@ -1,0 +1,23 @@
+# Ignorar node_modules en cualquier nivel
+**/node_modules/
+
+# Ignorar todos los archivos .env en cualquier nivel
+**/.env
+
+# Ignorar archivos específicos de Windows
+Thumbs.db
+desktop.ini
+
+# Ignorar archivos de log
+*.log
+
+# Ignorar directorios de construcción
+**/build/
+**/dist/
+
+# Ignorar archivos de configuración de IDE
+.vscode/
+.idea/
+
+# Ignorar archivos de caché
+.cache/

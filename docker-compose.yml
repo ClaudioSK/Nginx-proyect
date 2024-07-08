@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+    environment:
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PATH=/
+      - VIRTUAL_PORT=3000
+    networks:
+      - app_network
+
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+    environment:
+      - VIRTUAL_HOST=localhost
+      - VIRTUAL_PATH=/api
+      - VIRTUAL_PORT=3000
+    networks:
+      - app_network
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs:ro
+      - html:/usr/share/nginx/html
+      - vhost:/etc/nginx/vhost.d
+    environment:
+      - DEFAULT_HOST=localhost
+      - HTTPS_METHOD=noredirect
+    networks:
+      - app_network
+
+volumes:
+  html:
+  vhost:
+
+networks:
+  app_network:
+    driver: bridge
