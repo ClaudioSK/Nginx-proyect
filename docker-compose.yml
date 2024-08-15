@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
   frontend:
@@ -8,11 +8,16 @@ services:
     expose:
       - "3000"
     environment:
-      - VIRTUAL_HOST=appdigitala.salmofood.cl
-      - VIRTUAL_PATH=/
+      - VIRTUAL_HOST=localhost
       - VIRTUAL_PORT=3000
+      - WDS_SOCKET_PORT=0
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   backend:
     build:
@@ -21,11 +26,15 @@ services:
     expose:
       - "3000"
     environment:
-      - VIRTUAL_HOST=appdigitala.salmofood.cl
-      - VIRTUAL_PATH=/api
+      - VIRTUAL_HOST=localhost
       - VIRTUAL_PORT=3000
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   nginx-proxy:
     image: jwilder/nginx-proxy:alpine
@@ -37,11 +46,17 @@ services:
       - ./certs:/etc/nginx/certs:ro
       - html:/usr/share/nginx/html
       - vhost:/etc/nginx/vhost.d
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     environment:
-      - DEFAULT_HOST=appdigitala.salmofood.cl
-      - HTTPS_METHOD=noredirect
+      - DEFAULT_HOST=localhost
+      - HTTPS_METHOD=redirect
     networks:
       - app_network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
   html:

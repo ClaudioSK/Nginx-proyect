@@ -9,4 +9,14 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Get('health')
+  getHealth(): { status: string } {
+    return { status: 'healthy' };
+  }
+
+  @Get('test')
+  getTest(): { message: string } {
+    return { message: 'Hello from the NestJS API!' };
+  }
 }
